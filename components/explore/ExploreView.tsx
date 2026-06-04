@@ -24,6 +24,7 @@ const CATEGORIES = [
   'market',
   'bookshop',
   'club',
+  'bakery',
 ];
 
 export function ExploreView({ userCity }: { userCity: string }) {

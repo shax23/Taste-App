@@ -4,19 +4,23 @@
  */
 const { PrismaClient } = require('@prisma/client');
 const { execSync } = require('child_process');
+const { upsertPlaces } = require('./upsert-places');
 
 const prisma = new PrismaClient();
 
-prisma.user
-  .count()
-  .then((count) => {
-    if (count === 0) {
-      console.log('Empty database — running seed…');
-      execSync('npx tsx prisma/seed.ts', { stdio: 'inherit' });
-    } else {
-      console.log(`Database already has ${count} users — skipping seed.`);
-    }
-  })
+async function main() {
+  const count = await prisma.user.count();
+  if (count === 0) {
+    console.log('Empty database — running seed…');
+    execSync('npx tsx prisma/seed.ts', { stdio: 'inherit' });
+  } else {
+    console.log(`Database already has ${count} users — skipping seed.`);
+  }
+  // curated places top-up — idempotent, runs every boot
+  await upsertPlaces(prisma);
+}
+
+main()
   .catch((e) => {
     console.error('ensure-seed failed:', e);
     process.exit(1);
