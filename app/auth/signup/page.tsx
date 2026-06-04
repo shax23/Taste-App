@@ -12,7 +12,7 @@ export default function SignUpPage() {
   const [form, setForm] = useState({
     username: '',
     displayName: '',
-    city: '',
+    neighbourhood: '',
     password: '',
   });
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +63,7 @@ export default function SignUpPage() {
             Taste<span className="not-italic text-accent">.</span>
           </p>
           <p className="mt-3 text-sm text-text-muted">
-            Find your people through what you love doing.
+            Find your people in Barcelona through what you love doing.
           </p>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
@@ -86,12 +86,11 @@ export default function SignUpPage() {
             required
           />
           <Input
-            label="City"
-            name="city"
-            value={form.city}
-            onChange={update('city')}
-            placeholder="e.g. Barcelona"
-            required
+            label="Neighbourhood (optional)"
+            name="neighbourhood"
+            value={form.neighbourhood}
+            onChange={update('neighbourhood')}
+            placeholder="e.g. Gràcia, El Born, Eixample…"
           />
           <Input
             label="Password"

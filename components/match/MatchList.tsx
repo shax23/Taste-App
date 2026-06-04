@@ -51,10 +51,12 @@ export function MatchList({ matches }: { matches: MatchUser[] }) {
                 </span>
                 <Badge variant={tierBadgeVariant(match.tier)}>{match.tier}</Badge>
               </div>
-              <p className="mt-0.5 flex items-center gap-1 text-xs text-text-muted">
-                <MapPin size={11} strokeWidth={1.8} />
-                {match.city}
-              </p>
+              {match.city && match.city !== 'Barcelona' && (
+                <p className="mt-0.5 flex items-center gap-1 text-xs text-text-muted">
+                  <MapPin size={11} strokeWidth={1.8} />
+                  {match.city}
+                </p>
+              )}
             </div>
             <div className="shrink-0 text-right">
               <p className="text-xs text-text-muted">overlap</p>

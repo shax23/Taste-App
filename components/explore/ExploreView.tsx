@@ -1,12 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { MapIcon, List } from 'lucide-react';
 import { PlaceCard, type ExplorePlace } from './PlaceCard';
 import { PlaceCardSkeleton } from '@/components/ui/Skeletons';
 import { EmptyState, ErrorState } from '@/components/ui/EmptyState';
-import { cn, CITY_COORDS } from '@/lib/utils';
+import { cn, BCN_CENTER } from '@/lib/utils';
 
 const PlaceMap = dynamic(() => import('./PlaceMap'), {
   ssr: false,
@@ -27,10 +27,9 @@ const CATEGORIES = [
   'bakery',
 ];
 
-export function ExploreView({ userCity }: { userCity: string }) {
+export function ExploreView({ userCity: _userCity }: { userCity: string }) {
   const [places, setPlaces] = useState<ExplorePlace[]>([]);
   const [category, setCategory] = useState('all');
-  const [city, setCity] = useState<string>(CITY_COORDS[userCity] ? userCity : 'all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [mobileTab, setMobileTab] = useState<'list' | 'map'>('list');
@@ -39,7 +38,7 @@ export function ExploreView({ userCity }: { userCity: string }) {
     setLoading(true);
     setError(false);
     try {
-      const res = await fetch(`/api/places?city=${encodeURIComponent(city)}&category=${category}`);
+      const res = await fetch(`/api/places?city=Barcelona&category=${category}`);
       if (!res.ok) throw new Error('places failed');
       const data = await res.json();
       setPlaces(data.places);
@@ -48,50 +47,28 @@ export function ExploreView({ userCity }: { userCity: string }) {
     } finally {
       setLoading(false);
     }
-  }, [city, category]);
+  }, [category]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  const center = useMemo(() => {
-    if (CITY_COORDS[city]) return CITY_COORDS[city];
-    if (places.length > 0) return { lat: places[0].lat, lng: places[0].lng };
-    return CITY_COORDS[userCity] ?? { lat: 41.3874, lng: 2.1686 };
-  }, [city, places, userCity]);
-
-  const cities = ['all', ...Object.keys(CITY_COORDS)];
-
   const filters = (
-    <div className="flex flex-wrap gap-2">
-      <select
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
-        className="h-9 rounded-full border border-line bg-surface px-3 text-sm text-text-primary focus:border-accent focus:outline-none"
-        aria-label="City"
-      >
-        {cities.map((c) => (
-          <option key={c} value={c}>
-            {c === 'all' ? 'All cities' : c}
-          </option>
-        ))}
-      </select>
-      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-        {CATEGORIES.map((c) => (
-          <button
-            key={c}
-            onClick={() => setCategory(c)}
-            className={cn(
-              'shrink-0 rounded-full px-3.5 py-1.5 text-sm capitalize transition-colors',
-              category === c
-                ? 'bg-text-primary text-white'
-                : 'border border-line text-text-muted hover:bg-surface-2'
-            )}
-          >
-            {c === 'all' ? 'All' : c}
-          </button>
-        ))}
-      </div>
+    <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+      {CATEGORIES.map((c) => (
+        <button
+          key={c}
+          onClick={() => setCategory(c)}
+          className={cn(
+            'shrink-0 rounded-full px-3.5 py-1.5 text-sm capitalize transition-colors',
+            category === c
+              ? 'bg-text-primary text-white'
+              : 'border border-line text-text-muted hover:bg-surface-2'
+          )}
+        >
+          {c === 'all' ? 'All' : c}
+        </button>
+      ))}
     </div>
   );
 
@@ -104,7 +81,7 @@ export function ExploreView({ userCity }: { userCity: string }) {
   ) : error ? (
     <ErrorState message="Couldn't load places." onRetry={load} />
   ) : places.length === 0 ? (
-    <EmptyState message="No places match these filters yet. Try widening your search." />
+    <EmptyState message="No places match this filter yet." />
   ) : (
     <div className="space-y-3">
       {places.map((place) => (
@@ -117,7 +94,7 @@ export function ExploreView({ userCity }: { userCity: string }) {
     <div className="py-6 md:py-10">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl italic">Explore</h1>
+          <h1 className="font-display text-3xl italic">Explore Barcelona</h1>
           <p className="mt-1 text-sm text-text-muted">
             Places your taste network actually goes.
           </p>
@@ -145,7 +122,7 @@ export function ExploreView({ userCity }: { userCity: string }) {
       {/* desktop: split panel — map left, cards right */}
       <div className="hidden gap-6 md:grid md:grid-cols-[1.2fr_1fr]">
         <div className="sticky top-24 h-[calc(100vh-180px)] overflow-hidden rounded-2xl border border-line">
-          <PlaceMap places={places} center={center} zoom={CITY_COORDS[city] ? 12 : 3} />
+          <PlaceMap places={places} center={BCN_CENTER} zoom={13} />
         </div>
         <div className="max-h-[calc(100vh-180px)] overflow-y-auto pr-1">{list}</div>
       </div>
@@ -156,7 +133,7 @@ export function ExploreView({ userCity }: { userCity: string }) {
           list
         ) : (
           <div className="h-[60vh] overflow-hidden rounded-2xl border border-line">
-            <PlaceMap places={places} center={center} zoom={CITY_COORDS[city] ? 12 : 3} />
+            <PlaceMap places={places} center={BCN_CENTER} zoom={13} />
           </div>
         )}
       </div>

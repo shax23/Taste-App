@@ -20,11 +20,4 @@ export function cn(...classes: (string | false | null | undefined)[]): string {
   return classes.filter(Boolean).join(' ');
 }
 
-export const CITY_COORDS: Record<string, { lat: number; lng: number }> = {
-  Barcelona: { lat: 41.3874, lng: 2.1686 },
-  Berlin: { lat: 52.52, lng: 13.405 },
-  Tokyo: { lat: 35.6762, lng: 139.6503 },
-  Seoul: { lat: 37.5665, lng: 126.978 },
-  'New York': { lat: 40.7128, lng: -74.006 },
-  London: { lat: 51.5074, lng: -0.1278 },
-};
+export const BCN_CENTER = { lat: 41.3874, lng: 2.1686 };

@@ -64,7 +64,7 @@ export function OwnProfileHeader(props: Props) {
             <input
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              placeholder="City"
+              placeholder="Neighbourhood — e.g. Gràcia, El Born, Poblenou…"
               className="h-10 w-full rounded-xl border border-line bg-surface px-3 text-sm focus:border-accent focus:outline-none"
             />
             <textarea
@@ -97,10 +97,12 @@ export function OwnProfileHeader(props: Props) {
           </div>
         ) : (
           <>
-            <p className="mt-1 flex items-center justify-center gap-1 text-sm text-text-muted md:justify-start">
-              <MapPin size={13} strokeWidth={1.8} />
-              {props.city}
-            </p>
+            {props.city && props.city !== 'Barcelona' && (
+              <p className="mt-1 flex items-center justify-center gap-1 text-sm text-text-muted md:justify-start">
+                <MapPin size={13} strokeWidth={1.8} />
+                {props.city}
+              </p>
+            )}
             {props.bio && (
               <p className="mt-3 max-w-md text-sm leading-relaxed">{props.bio}</p>
             )}

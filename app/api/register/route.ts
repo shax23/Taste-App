@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   const username = String(body?.username ?? '').toLowerCase().trim();
   const displayName = String(body?.displayName ?? '').trim();
-  const city = String(body?.city ?? '').trim();
+  const neighbourhood = String(body?.neighbourhood ?? '').trim().slice(0, 50) || 'Barcelona';
   const password = String(body?.password ?? '');
 
   if (!/^[a-z0-9_.-]{3,24}$/.test(username)) {
@@ -17,9 +17,6 @@ export async function POST(req: Request) {
   }
   if (!displayName || displayName.length > 50) {
     return NextResponse.json({ error: 'Display name is required.' }, { status: 400 });
-  }
-  if (!city || city.length > 50) {
-    return NextResponse.json({ error: 'City is required.' }, { status: 400 });
   }
   if (password.length < 6) {
     return NextResponse.json(
@@ -38,7 +35,7 @@ export async function POST(req: Request) {
     data: {
       username,
       displayName,
-      city,
+      city: neighbourhood,
       passwordHash,
       avatarUrl: `https://api.dicebear.com/7.x/notionists-neutral/svg?seed=${encodeURIComponent(username)}&backgroundColor=f2e4d8`,
       credibilityScore: { create: {} },

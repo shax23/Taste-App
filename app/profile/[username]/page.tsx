@@ -37,10 +37,12 @@ export default async function ProfilePage({
             <h1 className="font-display text-3xl">{profile.user.displayName}</h1>
             <span className="text-sm text-text-muted">@{profile.user.username}</span>
           </div>
-          <p className="mt-1 flex items-center justify-center gap-1 text-sm text-text-muted md:justify-start">
-            <MapPin size={13} strokeWidth={1.8} />
-            {profile.user.city}
-          </p>
+          {profile.user.city && profile.user.city !== 'Barcelona' && (
+            <p className="mt-1 flex items-center justify-center gap-1 text-sm text-text-muted md:justify-start">
+              <MapPin size={13} strokeWidth={1.8} />
+              {profile.user.city}
+            </p>
+          )}
           {profile.user.bio && (
             <p className="mt-3 max-w-md text-sm leading-relaxed">{profile.user.bio}</p>
           )}
