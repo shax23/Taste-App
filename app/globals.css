@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f7f4ef; /* warm off-white, like aged paper */
+  --surface: #ffffff;
+  --surface-2: #f0ede7; /* card backgrounds */
+  --text-primary: #1a1714; /* near-black, warm */
+  --text-muted: #7a7269; /* warm gray */
+  --accent: #c8602a; /* burnt sienna — the one bold color */
+  --accent-light: #f2e4d8; /* accent tint for tags/badges */
+  --border: #e2ddd6;
+  --score-high: #2d6a4f; /* deep green for high credibility */
+  --score-mid: #e9a826; /* amber for medium */
+  --score-low: #c8602a; /* same as accent for low */
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-serif), Georgia, serif;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- skeleton shimmer ---- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.55),
+    transparent
+  );
+  animation: shimmer 1.6s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ---- leaflet refinements ---- */
+.leaflet-container {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  background: var(--surface-2);
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgba(26, 23, 20, 0.08);
+}
+.leaflet-popup-content {
+  margin: 12px 14px;
+}
+.taste-pin {
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(26, 23, 20, 0.3);
+}
+.taste-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(26, 23, 20, 0.3);
+}
+
+/* thin warm scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}

@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init *)",
+      "Read(//opt/homebrew/bin/**)",
+      "Bash(xcode-select -p)",
+      "Bash(curl -sL \"https://api.github.com/repos/cli/cli/releases/latest\")",
+      "Bash(mkdir -p ~/.local/bin)",
+      "Read(//private/tmp/**)",
+      "Bash(curl -sL -o gh.zip \"https://github.com/cli/cli/releases/download/v2.93.0/gh_2.93.0_macOS_arm64.zip\")",
+      "Bash(unzip -oq gh.zip)",
+      "Bash(cp gh_2.93.0_macOS_arm64/bin/gh ~/.local/bin/gh)",
+      "Read(//Users/ezgi/**)",
+      "Bash(echo 'export PATH=\"$HOME/.local/bin:$PATH\"')"
+    ]
+  }
+}
