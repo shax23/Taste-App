@@ -335,9 +335,9 @@ async function main() {
 
   // places
   const places: Record<string, string> = {};
-  for (const def of PLACES) {
-    const p = await prisma.place.create({ data: def });
-    places[def.key] = p.id;
+  for (const { key, ...placeData } of PLACES) {
+    const p = await prisma.place.create({ data: placeData });
+    places[key] = p.id;
   }
 
   // users
