@@ -1,58 +1,67 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { loadProfile } from '@/lib/profile';
-import { OwnProfileHeader } from '@/components/profile/OwnProfileHeader';
-import { CredibilityBreakdown } from '@/components/profile/CredibilityBreakdown';
-import { TasteMap } from '@/components/profile/TasteMap';
-import { ProfileTabs } from '@/components/profile/ProfileTabs';
+import { Pencil, Sparkles } from 'lucide-react';
+import { prisma } from '@/lib/prisma';
+import { getViewer } from '@/lib/viewer';
+import { Avatar } from '@/components/ui/Avatar';
+import { PicksSection } from '@/components/profile/PicksSection';
+import type { PickPin } from '@/components/profile/PickMap';
+
+export const dynamic = 'force-dynamic';
 
 export default async function MyProfilePage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.username) redirect('/auth/signin');
+  const viewer = await getViewer();
+  if (!viewer) redirect('/auth/signin');
+  if (!viewer.published) redirect('/onboarding');
 
-  const profile = await loadProfile(session.user.username);
-  if (!profile) redirect('/auth/signin');
-
-  const joined = profile.user.createdAt.toLocaleDateString('en-GB', {
-    month: 'long',
-    year: 'numeric',
+  const me = await prisma.user.findUniqueOrThrow({
+    where: { id: viewer.id },
+    include: { picks: { include: { place: true }, orderBy: { rank: 'asc' } } },
   });
+
+  const pins: PickPin[] = me.picks.map((p) => ({
+    rank: p.rank,
+    name: p.place.name,
+    note: p.note,
+    category: p.place.category,
+    neighborhood: p.place.neighborhood,
+    lat: p.place.lat,
+    lng: p.place.lng,
+    shared: false,
+  }));
 
   return (
     <div className="py-8 md:py-12">
-      <OwnProfileHeader
-        displayName={profile.user.displayName}
-        username={profile.user.username}
-        avatarUrl={profile.user.avatarUrl}
-        bio={profile.user.bio}
-        city={profile.user.city}
-        score={profile.score.totalScore}
-        tier={profile.score.tier}
-        interests={profile.interests}
-      />
-
-      <div className="mt-10 grid gap-6 md:grid-cols-2">
-        <CredibilityBreakdown
-          tasteSignalStrength={profile.score.tasteSignalStrength}
-          peerValidationDensity={profile.score.peerValidationDensity}
-          consistencyBonus={profile.score.consistencyBonus}
-          importedFollowerScore={profile.score.importedFollowerScore}
-          defaultOpen
-        />
-        <div className="rounded-2xl border border-line bg-surface p-5">
-          <h2 className="text-sm font-medium">Taste map</h2>
-          <TasteMap data={profile.tasteMap} />
+      <header className="flex flex-col items-center gap-5 text-center md:flex-row md:items-center md:gap-6 md:text-left">
+        <Avatar src={me.avatarUrl} name={me.displayName} size="xl" />
+        <div className="flex-1">
+          <div className="flex flex-col items-center gap-2 md:flex-row md:items-baseline md:gap-3">
+            <h1 className="font-display text-3xl">{me.displayName}</h1>
+            <span className="text-sm text-text-muted">@{me.username}</span>
+            {me.isTastemaker && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-accent-light px-2.5 py-0.5 text-xs font-medium text-accent">
+                <Sparkles size={11} /> Tastemaker
+              </span>
+            )}
+          </div>
+          {me.bio && (
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-text-muted">{me.bio}</p>
+          )}
         </div>
-      </div>
+        <Link
+          href="/onboarding"
+          className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium transition-colors hover:border-accent hover:text-accent"
+        >
+          <Pencil size={14} /> Edit my list
+        </Link>
+      </header>
 
-      <div className="mt-10">
-        <ProfileTabs
-          posts={profile.posts}
-          places={profile.places}
-          about={{ bio: profile.user.bio, city: profile.user.city, joined }}
-        />
-      </div>
+      <section className="mt-10">
+        <h2 className="mb-4 font-display text-xl italic">
+          My Barcelona<span className="not-italic text-accent">.</span>
+        </h2>
+        <PicksSection pins={pins} ownerName={me.displayName} />
+      </section>
     </div>
   );
 }

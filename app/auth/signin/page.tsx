@@ -12,7 +12,7 @@ function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') ?? '/';
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -21,14 +21,22 @@ function SignInForm() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const res = await signIn('credentials', {
-      username,
-      password,
-      redirect: false,
-    });
+    // email + no password → passwordless email sign-in
+    const res =
+      identifier.includes('@') && !password
+        ? await signIn('email', { email: identifier, redirect: false })
+        : await signIn('credentials', {
+            username: identifier,
+            password,
+            redirect: false,
+          });
     setLoading(false);
     if (res?.error) {
-      setError('Invalid username or password.');
+      setError(
+        identifier.includes('@') && !password
+          ? 'No account found for that email.'
+          : 'Invalid username or password.'
+      );
       return;
     }
     router.push(callbackUrl);
@@ -38,10 +46,10 @@ function SignInForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <Input
-        label="Username"
-        name="username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        label="Email or username"
+        name="identifier"
+        value={identifier}
+        onChange={(e) => setIdentifier(e.target.value)}
         autoComplete="username"
         autoFocus
         required
@@ -53,7 +61,7 @@ function SignInForm() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         autoComplete="current-password"
-        required
+        placeholder="Not needed if you signed up with email"
       />
       {error && <p className="text-sm text-accent">{error}</p>}
       <Button type="submit" size="lg" className="w-full" disabled={loading}>

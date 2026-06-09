@@ -2,14 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Map, Sparkles, User, Users } from 'lucide-react';
+import { Home, Map, ListOrdered, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const LINKS = [
   { href: '/', icon: Home, label: 'Home' },
   { href: '/explore', icon: Map, label: 'Map' },
-  { href: '/match', icon: Users, label: 'Match' },
-  { href: '/ezgi', icon: Sparkles, label: 'Ezgi' },
+  { href: '/onboarding', icon: ListOrdered, label: 'My List' },
   { href: '/profile/me', icon: User, label: 'Profile' },
 ];
 

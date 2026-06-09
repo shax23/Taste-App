@@ -15,6 +15,29 @@ module.exports = [
   { name: 'La Pubilla', category: 'restaurant', address: 'Plaça de la Llibertat 23, Gràcia', lat: 41.4005, lng: 2.1561 },
   { name: 'Bar Cañete', category: 'restaurant', address: 'Carrer de la Unió 17, Raval', lat: 41.3793, lng: 2.1734 },
 
+  // ─── restaurants — TripAdvisor Barcelona top listings ───
+  // (addresses approximate where TripAdvisor lists no street address)
+  { name: 'Cervecería Catalana', category: 'restaurant', address: 'Carrer de Mallorca 236, Eixample', lat: 41.3925, lng: 2.1603 },
+  { name: 'Con Gracia', category: 'restaurant', address: 'Carrer Martínez de la Rosa 8, Gràcia', lat: 41.4001, lng: 2.1576 },
+  { name: 'La Pepita', category: 'restaurant', address: 'Carrer de Còrsega 343, Gràcia', lat: 41.3987, lng: 2.1591 },
+  { name: 'Bodega Biarritz 1881', category: 'restaurant', address: 'Carrer del Vidre 8, Barri Gòtic', lat: 41.3797, lng: 2.1752 },
+  { name: 'Billy Brunch', category: 'restaurant', address: 'Carrer de Bailèn 115, Eixample', lat: 41.3996, lng: 2.166 },
+  { name: 'Restaurant Casa Amalia', category: 'restaurant', address: 'Passatge del Mercat 4, Eixample', lat: 41.3953, lng: 2.1672 },
+  { name: 'Casa Amàlia Port Vell', category: 'restaurant', address: 'Moll de la Fusta, Port Vell', lat: 41.3786, lng: 2.1819 },
+  { name: 'Bo De Boqueria', category: 'restaurant', address: 'La Rambla, by Mercat de la Boqueria', lat: 41.3818, lng: 2.1715 },
+  { name: 'Arcano Restaurant', category: 'restaurant', address: 'Carrer dels Mercaders 10, El Born', lat: 41.3853, lng: 2.1796 },
+  { name: "Mimo's Born", category: 'restaurant', address: 'El Born', lat: 41.3848, lng: 2.1818 },
+  { name: 'Taps Barcelona', category: 'restaurant', address: 'Barri Gòtic', lat: 41.3789, lng: 2.179 },
+  { name: 'Terrazza Ravello', category: 'restaurant', address: 'Ciutat Vella', lat: 41.3812, lng: 2.1768 },
+  { name: 'Bella Italia', category: 'restaurant', address: 'Eixample, near Sagrada Família', lat: 41.403, lng: 2.173 },
+  { name: 'Paisano Bistro', category: 'restaurant', address: 'El Born', lat: 41.3845, lng: 2.1809 },
+  { name: 'Zenith Caffè', category: 'restaurant', address: 'Eixample', lat: 41.392, lng: 2.165 },
+  { name: 'Monte Marinero', category: 'restaurant', address: 'Barceloneta', lat: 41.3805, lng: 2.1893 },
+  { name: 'Nix Tapas & Drinks', category: 'restaurant', address: 'Ciutat Vella', lat: 41.3801, lng: 2.1773 },
+  { name: 'Don Asador', category: 'restaurant', address: 'Ciutat Vella', lat: 41.3815, lng: 2.1781 },
+  { name: 'Vai Moana', category: 'restaurant', address: 'Passeig Marítim, Platja del Somorrostro', lat: 41.385, lng: 2.197 },
+  { name: 'Bambú Beach Bar', category: 'restaurant', address: 'Passeig Marítim del Bogatell', lat: 41.394, lng: 2.207 },
+
   // ─── bars ───
   { name: 'Paradiso', category: 'bar', address: 'Carrer de Rera Palau 4, El Born', lat: 41.3838, lng: 2.1842 },
   { name: 'Quimet & Quimet', category: 'bar', address: 'Carrer del Poeta Cabanyes 25, Poble-sec', lat: 41.3737, lng: 2.1622 },

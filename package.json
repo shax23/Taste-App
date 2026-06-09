@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "start:railway": "prisma migrate deploy && node scripts/ensure-seed.js && next start -p $PORT",
+    "start:railway": "prisma migrate deploy && node scripts/ensure-seed.js && node scripts/update-avatars.js && next start -p $PORT",
     "lint": "next lint"
   },
   "prisma": {

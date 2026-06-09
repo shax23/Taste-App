@@ -1,17 +1,11 @@
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { getViewer } from '@/lib/viewer';
 import { ExploreView } from '@/components/explore/ExploreView';
 
 export default async function ExplorePage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.userId) redirect('/auth/signin');
+  const viewer = await getViewer();
+  if (!viewer) redirect('/auth/signin');
+  if (!viewer.published) redirect('/onboarding'); // reciprocity gate
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.userId },
-    select: { city: true },
-  });
-
-  return <ExploreView userCity={user?.city ?? 'Barcelona'} />;
+  return <ExploreView userCity="Barcelona" />;
 }

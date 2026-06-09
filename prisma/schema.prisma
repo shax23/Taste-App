@@ -10,12 +10,15 @@ datasource db {
 model User {
   id                String   @id @default(cuid())
   username          String   @unique
+  email             String?  @unique
   displayName       String
   passwordHash      String
   bio               String?
   avatarUrl         String?
   city              String
   importedFollowers Int      @default(0) // cold-start signal, decays
+  isTastemaker      Boolean  @default(false) // seeded curator with a trusted list
+  publishedAt       DateTime? // reciprocity gate: set when their 10-place list goes live
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -24,6 +27,7 @@ model User {
   validations         Validation[]      @relation("Validator") // "I went here because of you, it delivered"
   receivedValidations Validation[]      @relation("ValidatedUser")
   credibilityScore    CredibilityScore?
+  picks               Pick[]
 }
 
 model Interest {
@@ -49,18 +53,38 @@ model UserInterest {
 }
 
 model Place {
-  id         String   @id @default(cuid())
-  name       String
-  category   String // cafe, restaurant, park, studio, gallery, etc.
-  address    String
-  city       String
-  lat        Float
-  lng        Float
-  coverImage String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  category     String // pick categories: cafe, restaurant, bar, area, activity, shop (legacy values map via lib/taste.ts)
+  address      String
+  city         String
+  neighborhood String? // e.g. "El Born", "Gràcia" — secondary overlap signal
+  externalId   String? // OpenStreetMap id when added via places lookup
+  lat          Float
+  lng          Float
+  coverImage   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   posts Post[]
+  picks Pick[]
+}
+
+// One slot in a user's curated 10-place list. The list IS the product:
+// stable, edited occasionally, no check-ins or activity.
+model Pick {
+  id        String   @id @default(cuid())
+  userId    String
+  placeId   String
+  note      String? // one line: why they love it
+  rank      Int // display order 1..10
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, placeId]) // a place appears once per list
 }
 
 model Post {

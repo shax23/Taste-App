@@ -84,6 +84,23 @@ body {
   border: 2px solid #fff;
   box-shadow: 0 1px 4px rgba(26, 23, 20, 0.3);
 }
+.pick-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(26, 23, 20, 0.3);
+}
+.pick-pin--shared {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light), 0 1px 4px rgba(26, 23, 20, 0.3);
+}
 .taste-cluster {
   display: flex;
   align-items: center;
