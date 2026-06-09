@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getViewer } from '@/lib/viewer';
 import { Avatar } from '@/components/ui/Avatar';
 import { PicksSection } from '@/components/profile/PicksSection';
+import { TasteSummary, buildTasteSummary } from '@/components/profile/TasteSummary';
 import type { PickPin } from '@/components/profile/PickMap';
 
 export const dynamic = 'force-dynamic';
@@ -16,8 +17,18 @@ export default async function MyProfilePage() {
 
   const me = await prisma.user.findUniqueOrThrow({
     where: { id: viewer.id },
-    include: { picks: { include: { place: true }, orderBy: { rank: 'asc' } } },
+    include: {
+      picks: { include: { place: true }, orderBy: { rank: 'asc' } },
+      interests: { include: { interest: true } },
+    },
   });
+
+  const interests = me.interests.map((ui) => ({
+    slug: ui.interest.slug,
+    label: ui.interest.label,
+    emoji: ui.interest.emoji,
+  }));
+  const taste = buildTasteSummary(me.picks, interests);
 
   const pins: PickPin[] = me.picks.map((p) => ({
     rank: p.rank,
@@ -48,15 +59,27 @@ export default async function MyProfilePage() {
             <p className="mt-2 max-w-md text-sm leading-relaxed text-text-muted">{me.bio}</p>
           )}
         </div>
-        <Link
-          href="/onboarding"
-          className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium transition-colors hover:border-accent hover:text-accent"
-        >
-          <Pencil size={14} /> Edit my list
-        </Link>
+        <div className="flex flex-col gap-2">
+          <Link
+            href="/onboarding"
+            className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium transition-colors hover:border-accent hover:text-accent"
+          >
+            <Pencil size={14} /> Edit my list
+          </Link>
+          <Link
+            href="/onboarding"
+            className="inline-flex items-center gap-2 rounded-full px-4 py-1 text-xs text-text-muted transition-colors hover:text-accent"
+          >
+            Edit my taste
+          </Link>
+        </div>
       </header>
 
-      <section className="mt-10">
+      <div className="mt-10">
+        <TasteSummary data={taste} title="My taste" />
+      </div>
+
+      <section className="mt-8">
         <h2 className="mb-4 font-display text-xl italic">
           My Barcelona<span className="not-italic text-accent">.</span>
         </h2>

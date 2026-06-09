@@ -5,6 +5,7 @@ import { getViewer } from '@/lib/viewer';
 import { computeOverlap, type OverlapInput } from '@/lib/taste';
 import { Avatar } from '@/components/ui/Avatar';
 import { PicksSection } from '@/components/profile/PicksSection';
+import { TasteSummary, buildTasteSummary } from '@/components/profile/TasteSummary';
 import type { PickPin } from '@/components/profile/PickMap';
 
 export const dynamic = 'force-dynamic';
@@ -23,6 +24,7 @@ export default async function ProfilePage({
     where: { username: params.username },
     include: {
       picks: { include: { place: true }, orderBy: { rank: 'asc' } },
+      interests: { include: { interest: true } },
     },
   });
   if (!user) notFound();
@@ -104,7 +106,21 @@ export default async function ProfilePage({
         </div>
       </header>
 
-      <section className="mt-10">
+      <div className="mt-10">
+        <TasteSummary
+          data={buildTasteSummary(
+            user.picks,
+            user.interests.map((ui) => ({
+              slug: ui.interest.slug,
+              label: ui.interest.label,
+              emoji: ui.interest.emoji,
+            }))
+          )}
+          title={`${user.displayName.split(' ')[0]}'s taste`}
+        />
+      </div>
+
+      <section className="mt-8">
         <h2 className="mb-4 font-display text-xl italic">
           {user.displayName.split(' ')[0]}'s Barcelona
           <span className="not-italic text-accent">.</span>
