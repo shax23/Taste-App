@@ -8,7 +8,8 @@
     "start": "next start",
     "start:railway": "prisma migrate deploy && node scripts/ensure-seed.js && node scripts/update-avatars.js && next start -p $PORT",
     "lint": "next lint",
-    "test:compat": "tsx lib/compatibility.test.ts"
+    "test:compat": "tsx lib/compatibility.test.ts",
+    "test:recommend": "tsx lib/recommendations.test.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
