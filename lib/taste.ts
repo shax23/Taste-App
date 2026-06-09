@@ -15,6 +15,15 @@ export const PICK_CATEGORIES = [
 
 export type PickCategory = (typeof PICK_CATEGORIES)[number]['slug'];
 
+/** Interest taxonomy category → the pick categories it hints at, for suggestions. */
+export const INTEREST_CATEGORY_PICKS: Record<string, PickCategory[]> = {
+  food: ['cafe', 'restaurant', 'bar', 'shop'],
+  movement: ['activity'],
+  culture: ['activity', 'shop'],
+  lifestyle: ['shop', 'area', 'cafe'],
+  nightlife: ['bar'],
+};
+
 /** Legacy Place.category values → pick category. */
 const LEGACY_MAP: Record<string, PickCategory> = {
   cafe: 'cafe',

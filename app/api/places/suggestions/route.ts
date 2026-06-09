@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { CITY, toPickCategory } from '@/lib/taste';
+import { CITY, toPickCategory, INTEREST_CATEGORY_PICKS } from '@/lib/taste';
+import { INTEREST_TAXONOMY } from '@/lib/interests';
 
 /**
  * GET /api/places/suggestions?categories=cafe,bar&neighborhoods=Gràcia,El Born
@@ -26,6 +27,20 @@ export async function GET(req: Request) {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
+  const interests = (searchParams.get('interests') ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  // expand chosen interests → the pick categories they hint at
+  const interestPicks = new Set<string>();
+  if (interests.length) {
+    const catBySlug = new Map(INTEREST_TAXONOMY.map((i) => [i.slug, i.category]));
+    for (const slug of interests) {
+      const cat = catBySlug.get(slug);
+      if (cat) for (const pc of INTEREST_CATEGORY_PICKS[cat] ?? []) interestPicks.add(pc);
+    }
+  }
 
   const mine = new Set(
     (await prisma.pick.findMany({ where: { userId }, select: { placeId: true } })).map(
@@ -46,9 +61,10 @@ export async function GET(req: Request) {
       const hoodMatch =
         neighborhoods.length === 0 ||
         (p.neighborhood ? neighborhoods.includes(p.neighborhood) : false);
+      const interestMatch = interestPicks.size === 0 || interestPicks.has(pickCat);
       // preference relevance, then popularity
       const relevance =
-        (catMatch ? 2 : 0) + (hoodMatch ? 1 : 0);
+        (catMatch ? 2 : 0) + (hoodMatch ? 1 : 0) + (interestMatch && interestPicks.size ? 1 : 0);
       return {
         place: {
           id: p.id,

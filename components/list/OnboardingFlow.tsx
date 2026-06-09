@@ -17,7 +17,17 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { PICK_CATEGORIES, LIST_SIZE } from '@/lib/taste';
+import { INTEREST_TAXONOMY, CATEGORY_LABELS, CATEGORIES } from '@/lib/interests';
 import { cn } from '@/lib/utils';
+
+// friendlier section headers for the vibes step
+const INTEREST_GROUP_LABELS: Record<string, string> = {
+  food: 'Food & Drink',
+  movement: 'Sports & Movement',
+  culture: 'Arts & Culture',
+  lifestyle: 'Lifestyle',
+  nightlife: 'Music & Nightlife',
+};
 
 const NEIGHBORHOODS = [
   'Gràcia',
@@ -63,7 +73,7 @@ type SearchResult = {
 
 type Suggestion = SearchResult & { source: 'local'; placeId: string };
 
-const STEPS = ['intro', 'categories', 'neighborhoods', 'build'] as const;
+const STEPS = ['intro', 'interests', 'categories', 'neighborhoods', 'build'] as const;
 type Step = (typeof STEPS)[number];
 
 function catMeta(slug: string | null) {
@@ -76,6 +86,7 @@ export function OnboardingFlow() {
   const [dir, setDir] = useState(1);
 
   // preferences
+  const [vibes, setVibes] = useState<Set<string>>(new Set());
   const [cats, setCats] = useState<Set<string>>(new Set());
   const [hoods, setHoods] = useState<Set<string>>(new Set());
 
@@ -105,6 +116,17 @@ export function OnboardingFlow() {
       n.has(v) ? n.delete(v) : n.add(v);
       return n;
     });
+  }
+
+  // persist vibes to the user's interests (best-effort; API needs ≥3)
+  function saveVibes() {
+    if (vibes.size >= 3) {
+      fetch('/api/interests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slugs: [...vibes] }),
+      }).catch(() => {});
+    }
   }
 
   async function publish() {
@@ -146,14 +168,62 @@ export function OnboardingFlow() {
             exit={{ opacity: 0, x: dir * -40 }}
             transition={{ duration: 0.28, ease: 'easeOut' }}
           >
-            {step === 'intro' && <IntroStep onNext={() => go('categories')} />}
+            {step === 'intro' && <IntroStep onNext={() => go('interests')} />}
+
+            {step === 'interests' && (
+              <ChipStep
+                eyebrow="Step 1 of 3"
+                title="What are you into?"
+                subtitle="Sports, music, coffee, art… pick what you love. This colors the places we suggest."
+                onBack={() => go('intro')}
+                onNext={() => {
+                  saveVibes();
+                  go('categories');
+                }}
+                canSkip
+              >
+                <div className="space-y-6">
+                  {CATEGORIES.map((group) => {
+                    const items = INTEREST_TAXONOMY.filter((it) => it.category === group);
+                    return (
+                      <div key={group}>
+                        <p className="mb-2.5 text-xs font-medium uppercase tracking-widest text-text-muted">
+                          {INTEREST_GROUP_LABELS[group] ?? CATEGORY_LABELS[group]}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {items.map((it) => {
+                            const on = vibes.has(it.slug);
+                            return (
+                              <button
+                                key={it.slug}
+                                onClick={() => toggle(setVibes, it.slug)}
+                                className={cn(
+                                  'inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm transition-all',
+                                  on
+                                    ? 'border-accent bg-accent text-white shadow-sm'
+                                    : 'border-line bg-surface hover:border-accent/50'
+                                )}
+                              >
+                                <span aria-hidden>{it.emoji}</span>
+                                {it.label}
+                                {on && <Check size={13} strokeWidth={2.5} />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </ChipStep>
+            )}
 
             {step === 'categories' && (
               <ChipStep
-                eyebrow="Step 1 of 3"
+                eyebrow="Step 2 of 3"
                 title="What kinds of places are you?"
                 subtitle="Pick the categories that define your Barcelona. We'll suggest spots to match."
-                onBack={() => go('intro')}
+                onBack={() => go('interests')}
                 onNext={() => go('neighborhoods')}
                 canSkip
               >
@@ -186,7 +256,7 @@ export function OnboardingFlow() {
 
             {step === 'neighborhoods' && (
               <ChipStep
-                eyebrow="Step 2 of 3"
+                eyebrow="Step 3 of 3"
                 title="Where do you spend your time?"
                 subtitle="Choose the neighborhoods that feel like yours. Optional — it just sharpens your suggestions."
                 onBack={() => go('categories')}
@@ -219,6 +289,7 @@ export function OnboardingFlow() {
 
             {step === 'build' && (
               <BuildStep
+                vibes={vibes}
                 cats={cats}
                 hoods={hoods}
                 picks={picks}
@@ -304,6 +375,7 @@ function ChipStep({
 /* ------------------------------------------------------------- build step */
 
 function BuildStep({
+  vibes,
   cats,
   hoods,
   picks,
@@ -314,6 +386,7 @@ function BuildStep({
   onPublish,
   publishing,
 }: {
+  vibes: Set<string>;
   cats: Set<string>;
   hoods: Set<string>;
   picks: Pick[];
@@ -338,13 +411,14 @@ function BuildStep({
   // load preference-driven suggestions once
   useEffect(() => {
     const params = new URLSearchParams();
+    if (vibes.size) params.set('interests', [...vibes].join(','));
     if (cats.size) params.set('categories', [...cats].join(','));
     if (hoods.size) params.set('neighborhoods', [...hoods].join(','));
     fetch(`/api/places/suggestions?${params.toString()}`)
       .then((r) => r.json())
       .then((d) => setSuggestions(d.results ?? []))
       .catch(() => setSuggestions([]));
-  }, [cats, hoods]);
+  }, [vibes, cats, hoods]);
 
   // debounced search
   useEffect(() => {
@@ -567,7 +641,7 @@ function BuildStep({
       {!full && visibleSuggestions.length > 0 && (
         <div className="mt-6">
           <p className="mb-2.5 text-sm font-medium">
-            {cats.size || hoods.size ? 'Picked for you' : 'Popular in Barcelona'}
+            {vibes.size || cats.size || hoods.size ? 'Picked for you' : 'Popular in Barcelona'}
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
             {visibleSuggestions.map((s) => {
